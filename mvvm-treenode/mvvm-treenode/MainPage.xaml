@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:mvvm_treenode"
+             xmlns:treeview="clr-namespace:Telerik.XamarinForms.DataControls.TreeView;assembly=Telerik.XamarinForms.DataControls"
+             xmlns:progress="clr-namespace:Telerik.XamarinForms.DataControls;assembly=Telerik.XamarinForms.DataControls"
+             x:Class="mvvm_treenode.MainPage"
+             BackgroundColor="WhiteSmoke">
+    <ContentPage.BindingContext>
+        <local:MainPageViewModel/>
+    </ContentPage.BindingContext>
+    <ContentPage.Resources>
+        <local:LevelToIndentConverter x:Key="LevelToIndent" />
+    </ContentPage.Resources>
+    <StackLayout Margin="20,10">
+        <progress:RadTreeView x:Name="treeView" 
+                              ItemsSource="{Binding Tree}" >
+            <progress:TreeViewDescriptor DisplayMemberPath="Text"
+                                         ItemsSourcePath="Nodes"
+                                         TargetType="{x:Type local:TreeNodeModel}">
+                <progress:TreeViewDescriptor.ItemTemplate>
+                    <DataTemplate>
+                        <StackLayout Orientation="Horizontal" 
+                                     BackgroundColor="Transparent">
+                            <BoxView WidthRequest="{Binding Level, Converter={StaticResource LevelToIndent}}" 
+                                     BackgroundColor="Transparent"/>
+                            <treeview:ExpandCollapseIndicator BackgroundColor="Transparent"
+                                                              IsExpanded="{Binding IsExpanded}"
+                                                              FontSize="Medium"
+                                                              WidthRequest="40"
+                                                              TextColor="#222222"
+                                                              VerticalTextAlignment="Center"
+                                                              HorizontalTextAlignment="Center"
+                                                              IsLeaf="{Binding IsLeaf}"
+                                                              PropertyChanging="IndicatorPropertyChangedProxy"/>
+                            <treeview:ItemText Text="{Binding Header}" 
+                                   BackgroundColor="Transparent" 
+                                   FontSize="Medium" 
+                                   VerticalTextAlignment="Center">
+                            </treeview:ItemText>
+                        </StackLayout>
+                    </DataTemplate>
+                </progress:TreeViewDescriptor.ItemTemplate>
+            </progress:TreeViewDescriptor>
+        </progress:RadTreeView>
+        <Grid BackgroundColor="Beige" Margin="10" Padding="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Label Text="Exercise Property" HorizontalOptions="Center" TextColor="DarkRed"/>
+            <StackLayout Grid.Row="1" Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                <ImageButton 
+                    Padding="20,4"
+                    BorderWidth="1"
+                    BorderColor="PaleTurquoise"
+                    HorizontalOptions="CenterAndExpand"
+                    BackgroundColor="Transparent"
+                    Command="{Binding Tree.TimedExpandAllCommand}">
+                    <ImageButton.Source>
+                        <FontImageSource FontFamily="icons"
+                            Glyph="{StaticResource expanded}"
+                            Color="#222222"
+                            Size="20" />
+                    </ImageButton.Source>
+                </ImageButton>
+                <ImageButton 
+                    Padding="20,4"
+                    BorderWidth="1"
+                    BorderColor="PaleTurquoise"
+                    HorizontalOptions="CenterAndExpand"
+                    BackgroundColor="Transparent"
+                    Command="{Binding Tree.TimedCollapseAllCommand}" >
+                    <ImageButton.Source>
+                        <FontImageSource FontFamily="icons"
+                            Glyph="{StaticResource collapsed}"
+                            Color="#222222"
+                            Size="20" />
+                    </ImageButton.Source>
+                </ImageButton>
+            </StackLayout>
+        </Grid>
+    </StackLayout>
+</ContentPage>
