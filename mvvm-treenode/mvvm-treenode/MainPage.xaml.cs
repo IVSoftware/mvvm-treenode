@@ -44,8 +44,6 @@ namespace mvvm_treenode
             InitializeComponent();
             BindingContext.Tree.Expand = treeView.Expand;
             BindingContext.Tree.Collapse = treeView.Collapse;
-            TreeNodeModel.PropertyChanging += TreeNodeModel_PropertyChanging;
-
             var testData = new string[]
             {
                 @"Emerald\LevelA1\Level2\Leaf1",
@@ -59,33 +57,11 @@ namespace mvvm_treenode
                 BindingContext.Tree.Add(path);
             }
         }
-
-        private void TreeNodeModel_PropertyChanging(object sender, PropertyChangingCancelEventArgs e)
-        {
-            switch (e.PropertyName)
-            {
-                case nameof(TreeNodeModel.IsViewNodeExpanded):
-                    var node = (TreeNodeModel)sender;
-                    if (node.Tree != null)
-                    {
-                        if (node.Tree.IsEventTest && !node.IsViewNodeExpanded)
-                        {
-                            e.PromptTask = App.Current.MainPage.DisplayAlert("Before Expand", $"Do you want to open {node.Text}?", "Yes", "No");
-                        }
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-
         internal new MainPageViewModel BindingContext
         {
             get => (MainPageViewModel)base.BindingContext;
             set => base.BindingContext = value;
         }
-
-
         private void IndicatorPropertyChangedProxy(object sender, PropertyChangingEventArgs e)
         {
             switch (e.PropertyName)
@@ -184,7 +160,7 @@ namespace mvvm_treenode
             foreach (var node in GetDescendants())
             {
                 node.IsViewNodeExpanded = true;
-                await Task.Delay(400);
+                await Task.Delay(DELAY);
             }
         }
         public ICommand TimedCollapseAllCommand { get; }
@@ -197,9 +173,10 @@ namespace mvvm_treenode
             foreach (var node in GetDescendants().Reverse())
             {
                 node.IsViewNodeExpanded = false;
-                await Task.Delay(400);
+                await Task.Delay(DELAY);
             }
         }
+        const int DELAY = 200;
         public ICommand TestEventCommand { get; }
         private void OnTestEvent(object o)
         {
