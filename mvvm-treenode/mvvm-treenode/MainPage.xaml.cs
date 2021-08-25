@@ -266,15 +266,6 @@ namespace mvvm_treenode
             OnPropertyChanged(propertyName);
             return true;
         }
-        Queue<object> PropertySetterQueue = new Queue<object>();
-        bool BeforeSetProperty<T>(FieldInfo backingField, T value, [CallerMemberName] string propertyName = "")
-        {
-            if (EqualityComparer<T>.Default.Equals((T)backingField.GetValue(this), value))
-                return false;
-            var e = new PropertyChangingCancelEventArgs(backingField, value, propertyName);
-            OnPropertyChanging(e);
-            return true;
-        }
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = "")
@@ -282,8 +273,8 @@ namespace mvvm_treenode
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public static event PropertyChangingCancelEventHandler PropertyChanging;
-        protected virtual void OnPropertyChanging(PropertyChangingCancelEventArgs e)
+        public static event ExpandCollapseCancelEventHandler PropertyChanging;
+        protected virtual void OnPropertyChanging(ExpandCollapseCancelEventArgs e)
         {
             PropertyChanging?.Invoke(this, e);
         }
@@ -291,21 +282,12 @@ namespace mvvm_treenode
         #endregion
     }
 
-    delegate void PropertyChangingCancelEventHandler(object sender, PropertyChangingCancelEventArgs e);
+    public delegate void ExpandCollapseCancelEventHandler(object sender, ExpandCollapseCancelEventArgs e);
 
-    class PropertyChangingCancelEventArgs : PropertyChangingEventArgs
+    public class ExpandCollapseCancelEventArgs : PropertyChangingEventArgs
     {
-        public PropertyChangingCancelEventArgs (FieldInfo backingField, object value, string propertyName) : base(propertyName)
-        {
-            BackingField = backingField;
-            Value = value;
-        }
-
-        public FieldInfo BackingField { get; }
-        object Value { get; }
-
+        public ExpandCollapseCancelEventArgs(string propertyName) : base(propertyName) { }
         public bool Cancel { get; set; }
-        public Task<bool> PromptTask { get; internal set; }
     }
 
     class LevelToIndentConverter : IValueConverter
